@@ -3,8 +3,7 @@ Fit a beta-uniform mixture model to a list of p-values.
 The BUM model is introduced in Pounds & Morris, 2003.
 """
 
-class BUM():
-		
+class BUM():	
 	""" Introduces the class containing the output of the BUM model
 	
 	Parameters
@@ -19,11 +18,11 @@ class BUM():
 		Using the shape parameters, we can compute the proportion of the pvalues coming from the uniform distribution
 	"""
 		
-	def __init__(self,value,a,l,pi0):
+	def __init__(self,value,a,l,pi1):
 		self.value = value
 		self.a = a
 		self.l = l
-		self.pi0 = pi0
+		self.pi1 = pi1
 
 def fpLL(pars,x):
 	"""Returns the gradient function of the BUM model"""
@@ -65,13 +64,14 @@ def bumOptim(x,starts=1):
 	best = []
 	par = []
 	x = np.asarray(x)
+	x = [0.00001 if y==0 else y for y in x] #optimiser is stuck when p-values == 0
 	for i in range(0,starts):
 		pars = np.array((a[i],l[i]))
-		opt = scipy.optimize.minimize(fbumnLL,[pars[0],pars[1]],method='L-BFGS-B',args=[y],jac=fpLL,bounds=((0.00001,3),(0.00001,3)))
+		opt = scipy.optimize.minimize(fbumnLL,[pars[0],pars[1]],method='L-BFGS-B',args=[x],jac=fpLL,bounds=((0.00001,3),(0.00001,3)))
 		best.append(opt.fun)
 		par.append(opt.x)
 	minind=best.index(np.nanmin(best))
 	bestpar=par[minind]
-	pi0=bestpar[1] + (1-bestpar[1])*bestpar[0]
-	out = BUM(best[minind],bestpar[0],bestpar[1],pi0)
+	pi1=1-(bestpar[1] + (1-bestpar[1])*bestpar[0])
+	out = BUM(best[minind],bestpar[0],bestpar[1],pi1)
 	return(out)
