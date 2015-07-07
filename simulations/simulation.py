@@ -29,7 +29,7 @@ powerunarr=np.empty((sims,45),dtype=np.object)
 powercorarr = np.empty((sims,45),dtype=np.object)
 powerestarr = np.empty((sims,45),dtype=np.object)
 
-sim=1
+for sim in range(0,sims):
 	# set temporary directory (and make)
 	TEMPDIR = os.path.join(WORKDIR,"sim_"+str(sim)+"/")
 	os.mkdir(TEMPDIR)
