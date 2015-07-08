@@ -1,7 +1,11 @@
+import numpy as np
+import scipy 
+
 """
 Fit a beta-uniform mixture model to a list of p-values.
 The BUM model is introduced in Pounds & Morris, 2003.
 """
+
 
 class BUM():	
 	""" Introduces the class containing the output of the BUM model
@@ -67,11 +71,11 @@ def bumOptim(x,starts=1):
 	x = [0.00001 if y==0 else y for y in x] #optimiser is stuck when p-values == 0
 	for i in range(0,starts):
 		pars = np.array((a[i],l[i]))
-		opt = scipy.optimize.minimize(fbumnLL,[pars[0],pars[1]],method='L-BFGS-B',args=[x],jac=fpLL,bounds=((0.00001,3),(0.00001,3)))
+		opt = scipy.optimize.minimize(fbumnLL,[pars[0],pars[1]],method='L-BFGS-B',args=(x,),jac=fpLL,bounds=((0.00001,1),(0.00001,1)))
 		best.append(opt.fun)
 		par.append(opt.x)
 	minind=best.index(np.nanmin(best))
 	bestpar=par[minind]
 	pi1=1-(bestpar[1] + (1-bestpar[1])*bestpar[0])
 	out = BUM(best[minind],bestpar[0],bestpar[1],pi1)
-	return(out)
+	return(pi1)
