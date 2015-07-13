@@ -23,13 +23,13 @@ execfile(os.path.join(HOMEDIR,'neuropower.py'))
 WORKDIR = "/Users/Joke/Documents/Onderzoek/Studie_7_newpower/WORKDIR/"
 os.chdir(WORKDIR)
 
-sims=50
+sims=4
 powerovarr=np.empty((sims,45),dtype=np.object)
 powerunarr=np.empty((sims,45),dtype=np.object)
 powercorarr = np.empty((sims,45),dtype=np.object)
 powerestarr = np.empty((sims,45),dtype=np.object)
 
-for sim in range(0,sims):
+for sim in range(4,sims+4):
 	# set temporary directory (and make)
 	TEMPDIR = os.path.join(WORKDIR,"sim_"+str(sim)+"/")
 	os.mkdir(TEMPDIR)
@@ -39,9 +39,9 @@ for sim in range(0,sims):
 	positions = np.array([[40,40,40],
 						 [40,70,40],
 						 [70,70,70]])
-	amplitude=np.array([4,5,2])
+	amplitude=np.array([0,0,0])
 	mask = nib.load(os.path.join(WORKDIR,"mask.nii.gz"))
-	smooth_FWHM = 3
+	smooth_FWHM = 5
 	smooth_sd = smooth_FWHM/(2*math.sqrt(2*math.log(2)))
 	data = surrogate_3d_dataset(n_subj=10,sk=smooth_sd,shape=mask.get_shape(),mask=mask,noise_level=1,pos=positions,ampli=amplitude,width=7)
 	data = (data.transpose([1,2,3,0])*1000)
@@ -75,6 +75,11 @@ for sim in range(0,sims):
 	cl.inputs.num_maxima=2000
 	cl.inputs.connectivity=26
 	cl.run()
+
+
+
+tmap = nib.load("stats/tstat1.nii.gz").get_data()
+
 	
 	# read in peak file
 	peaks = pd.read_csv(os.path.join(TEMPDIR,"locmax.txt"),sep="\t").drop('Unnamed: 5',1)
@@ -188,10 +193,34 @@ plt.ylim((0,0.8))
 plt.show()
 
 
+class nipy.algorithms.statistics.rft.TStat(dfd=inf, search=[1])
 
+    Bases: nipy.algorithms.statistics.rft.ECcone
 
+    EC densities for a t random field.
 
+    Methods
+    __call__(x[, search]) 	Get expected EC for a search region
+    density(x, dim) 	The EC density in dimension dim.
+    integ([m, k]) 	
+    pvalue(x[, search]) 	
+    quasi(dim) 	(Quasi-)polynomial parts of EC density in dimension dim
 
+    __init__(dfd=inf, search=[1])
+
+    density(x, dim)
+
+        The EC density in dimension dim.
+
+    integ(m=None, k=None)
+
+    pvalue(x, search=None)
+
+    quasi(dim)
+
+        (Quasi-)polynomial parts of EC density in dimension dim
+
+            ignoring a factor of (2pi)^{-(dim+1)/2} in front.
 
 
 
